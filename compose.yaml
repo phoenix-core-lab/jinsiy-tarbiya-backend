@@ -1,0 +1,29 @@
+version: '3.9'
+services:
+  app:
+    container_name: pro-skill-app
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '5000:5000'
+    environment:
+      DATABASE_URL: postgres://postgres:secret@db:5432/proskill
+      NODE_ENV: development
+
+  db:
+    image: postgres:13
+    container_name: pro-skill-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: proskill
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

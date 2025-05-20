@@ -1,0 +1,241 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               Int         @id @default(autoincrement())
+  fullName         String
+  phoneNumber      String      @unique
+  password         String
+  balls            Int         @default(100)
+  authorized       Boolean     @default(false)
+  notes            Notes[]
+  online           Boolean     @default(false)
+  role             String      @default("user")
+  completedLessons Json[]
+  createdAt        DateTime    @default(now())
+  purchases        Purchases[]
+  paid             Paid[]
+  payments         Payments[]
+}
+
+model PhoneCode {
+  id          Int      @id @default(autoincrement())
+  phoneNumber String   @unique
+  code        String
+  createdAt   DateTime @default(now())
+}
+
+model Library {
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  items    Item[]
+  photoUrl String
+}
+
+model File {
+  id        Int      @id @default(autoincrement())
+  fileName  String
+  fileUrl   String
+  createdAt DateTime @default(now())
+}
+
+model Sms {
+  id          Int      @id @default(autoincrement())
+  name        String
+  surname     String
+  phoneNumber String
+  sms         String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Item {
+  id        Int         @id @default(autoincrement())
+  title     String
+  subtitle  String
+  author    String
+  price     Int // for balls
+  length    String
+  type      String
+  fileUrl   String
+  libraryId Int
+  photoUrl  String?
+  createdAt DateTime    @default(now())
+  Library   Library     @relation(fields: [libraryId], references: [id])
+  Purchases Purchases[]
+}
+
+model News {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  photoUrl    String
+  mainUrl     String?
+  createdAt   DateTime @default(now())
+}
+
+model Notes {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  userId      Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  User        User     @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model Courses {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  author      String
+  price       Int       @default(0)
+  time        String
+  photoUrls   String[]
+  modules     Modules[]
+  createdAt   DateTime  @default(now())
+  Paid        Paid[]
+}
+
+model Modules {
+  id        Int       @id @default(autoincrement())
+  Course    Courses   @relation(fields: [courseId], references: [id])
+  title     String
+  time      String
+  price     Int       @default(0)
+  courseId  Int
+  lessons   Lessons[]
+  createdAt DateTime  @default(now())
+  Paid      Paid[]
+}
+
+model Lessons {
+  id        Int         @id @default(autoincrement())
+  title     String
+  videoUrl  String
+  time      String
+  moduleId  Int
+  price     Int         @default(0)
+  Modules   Modules     @relation(fields: [moduleId], references: [id])
+  createdAt DateTime    @default(now())
+  questions Questions[]
+  items     String[]
+  Paid      Paid[]
+}
+
+model Questions {
+  id        Int       @id @default(autoincrement())
+  title     String
+  answers   Answers[]
+  createdAt DateTime  @default(now())
+  Lesson    Lessons   @relation(fields: [lessonId], references: [id])
+  lessonId  Int
+}
+
+model Answers {
+  id         Int       @id @default(autoincrement())
+  title      String
+  isCorrect  Boolean
+  questionId Int
+  Question   Questions @relation(fields: [questionId], references: [id])
+  createdAt  DateTime  @default(now())
+}
+
+model Purchases {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  itemId    Int
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id])
+  item      Item     @relation(fields: [itemId], references: [id])
+}
+
+model Chat {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  message    String
+  fromMentor Boolean
+  createdAt  DateTime @default(now())
+}
+
+model ClickCards {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  cardNumber  String   @unique
+  expireDate  String
+  cardToken   String?
+  phoneNumber String?
+  createdAt   DateTime @default(now())
+}
+
+model PaymeCards {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  cardNumber  String   @unique
+  expireDate  String
+  cardToken   String?
+  phoneNumber String?
+  createdAt   DateTime @default(now())
+}
+
+model UzumCards {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  cardNumber  String   @unique
+  expireDate  String
+  cardToken   String?
+  phoneNumber String?
+  createdAt   DateTime @default(now())
+}
+
+model Paid {
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  User        User        @relation(fields: [userId], references: [id])
+  amount      Int
+  productType ProductType
+  lessonId    Int?
+  Lesson      Lessons?    @relation(fields: [lessonId], references: [id])
+  moduleId    Int?
+  Module      Modules?    @relation(fields: [moduleId], references: [id])
+  courseId    Int?
+  Course      Courses?    @relation(fields: [courseId], references: [id])
+  PaymentsId  Int
+  Payments    Payments    @relation(fields: [PaymentsId], references: [id])
+  createdAt   DateTime    @default(now())
+}
+
+model Payments {
+  id          Int         @id @default(autoincrement())
+  amount      Int
+  paymentType PaymentType
+  userId      Int
+  User        User        @relation(fields: [userId], references: [id])
+  Paid        Paid[]
+  createdAt   DateTime    @default(now())
+}
+
+enum PaymentType {
+  payme
+  click
+  uzum
+}
+
+enum ProductType {
+  lesson
+  module
+  course
+}
