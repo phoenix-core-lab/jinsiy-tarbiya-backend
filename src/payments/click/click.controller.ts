@@ -65,32 +65,16 @@ export class ClickController {
     @Request() req: any,
   ) {
     // await this.clickService.confirmCardToken(body.card_number, +body.sms_code);
-
     // const amount = await this.clickService.calculatePrice(
     //   body.products,
     //   req.userId,
     // );
-
-    const pay = await this.clickService.payWithCardToken(
-      body.card_number,
-      1000,
-      req.userId,
-    );
-
-    if (!pay) {
-      throw new HttpException('Payment failed', HttpStatus.BAD_REQUEST);
-    }
-    console.log('pay', pay);
-    console.log('pay.error', pay.error);
-    console.log('true or false :', pay.error == true);
-
-    if (pay.error_code) {
-      throw new HttpException(pay.message, HttpStatus.BAD_REQUEST);
-    } else {
-      {
-        const payments = await this.clickService.buyProducts(+req.userId, 1000);
-        return payments;
-      }
-    }
+    // const pay = await this.clickService.payWithCardToken(
+    //   body.card_number,
+    //   1000,
+    //   req.userId,
+    // );
+    const payments = await this.clickService.buyProducts(+req.userId, 1000);
+    return payments;
   }
 }
