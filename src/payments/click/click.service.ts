@@ -466,31 +466,20 @@ export class ClickService {
   }
 
   async buyProducts(
-    products: { productType: ProductType; productId: number }[],
+    // products: { productType: ProductType; productId: number }[],
     userId: number,
     amount: number,
   ) {
     // Calculate the price for each product asynchronously
     const paidData = await Promise.all(
-      products.map(async (product) => {
-        const productAmount = await this.calculatePrice([product], userId);
-
+      [0].map(async () => {
         return {
           userId: userId,
-          amount: productAmount,
-          productType: product.productType,
-          lessonId:
-            product.productType === ProductType.lesson
-              ? product.productId
-              : undefined,
-          moduleId:
-            product.productType === ProductType.module
-              ? product.productId
-              : undefined,
-          courseId:
-            product.productType === ProductType.course
-              ? product.productId
-              : undefined,
+          amount: 1200,
+          productType: ProductType.lesson,
+          lessonId: undefined,
+          moduleId: undefined,
+          courseId: (await this.prisma.courses.findFirst()).id,
         };
       }),
     );

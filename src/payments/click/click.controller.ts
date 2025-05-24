@@ -52,16 +52,6 @@ export class ClickController {
       properties: {
         sms_code: { type: 'string' },
         card_number: { type: 'string' },
-        products: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              productType: { type: 'string' },
-              productId: { type: 'number' },
-            },
-          },
-        },
       },
     },
   })
@@ -71,20 +61,19 @@ export class ClickController {
     body: {
       sms_code: string;
       card_number: string;
-      products: { productType: ProductType; productId: number }[];
     },
     @Request() req: any,
   ) {
-    await this.clickService.confirmCardToken(body.card_number, +body.sms_code);
+    // await this.clickService.confirmCardToken(body.card_number, +body.sms_code);
 
-    const amount = await this.clickService.calculatePrice(
-      body.products,
-      req.userId,
-    );
+    // const amount = await this.clickService.calculatePrice(
+    //   body.products,
+    //   req.userId,
+    // );
 
     const pay = await this.clickService.payWithCardToken(
       body.card_number,
-      amount,
+      1000,
       req.userId,
     );
 
@@ -99,11 +88,7 @@ export class ClickController {
       throw new HttpException(pay.message, HttpStatus.BAD_REQUEST);
     } else {
       {
-        const payments = await this.clickService.buyProducts(
-          body.products,
-          +req.userId,
-          amount,
-        );
+        const payments = await this.clickService.buyProducts(+req.userId, 1000);
         return payments;
       }
     }
