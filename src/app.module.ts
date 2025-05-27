@@ -21,6 +21,8 @@ import { PaymentsModule } from './payments/payments.module';
 import { BallsModule } from './balls/balls.module';
 import { CheckModule } from './check/check.module';
 import { ChatModule } from './chat/chat.module';
+import { LibraryModule } from './library/library.module';
+
 @Module({
   imports: [
     AuthModule,
@@ -28,6 +30,7 @@ import { ChatModule } from './chat/chat.module';
     CoursesModule,
     ItemModule,
     NewsModule,
+    ChatModule,
 
     //for serving static files
     ServeStaticModule.forRoot({
