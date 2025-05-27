@@ -372,6 +372,7 @@ export class CoursesService {
                 time: true,
                 price: true,
                 videoUrl: true,
+                items: true,
                 questions: {
                   include: {
                     answers: {
