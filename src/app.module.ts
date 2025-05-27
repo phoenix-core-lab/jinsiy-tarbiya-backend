@@ -31,6 +31,7 @@ import { LibraryModule } from './library/library.module';
     ItemModule,
     NewsModule,
     ChatModule,
+    LibraryModule,
 
     //for serving static files
     ServeStaticModule.forRoot({
