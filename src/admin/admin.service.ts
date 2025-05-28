@@ -55,7 +55,36 @@ export class AdminService {
     return await this.prisma.user.count();
   }
 
-  async findAll() {
-    return await this.prisma.user.findMany();
+  async findAll(take?: number, skip?: number) {
+    const takeNum = Number.isInteger(take) ? take : undefined;
+    const skipNum = Number.isInteger(skip) ? skip : undefined;
+    return await this.prisma.user.findMany({
+      select: {
+        id: true,
+        fullName: true,
+        phoneNumber: true,
+        authorized: true,
+        createdAt: true,
+        payments: true,
+      },
+      ...(take !== undefined && { take: takeNum }),
+      ...(skip !== undefined && { skip: skipNum }),
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  async filter(fullName?: string, phoneNumber?: string) {
+    return await this.prisma.user.findMany({
+      where: {
+        ...(fullName
+          ? { fullName: { contains: fullName, mode: 'insensitive' } }
+          : {}),
+        ...(phoneNumber
+          ? { phoneNumber: { contains: phoneNumber, mode: 'insensitive' } }
+          : {}),
+      },
+    });
   }
 }

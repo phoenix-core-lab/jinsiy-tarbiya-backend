@@ -1,6 +1,13 @@
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Query } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiTags,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { AdminGuard } from './admin.guard';
 
 @ApiTags('Admin')
@@ -34,9 +41,45 @@ export class AdminController {
 
   @UseGuards(AdminGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get all students' })
+  @ApiOperation({ summary: 'Get all students with optional pagination' })
+  @ApiQuery({
+    name: 'take',
+    required: false,
+    type: Number,
+    description: 'Number of records to return',
+  })
+  @ApiQuery({
+    name: 'skip',
+    required: false,
+    type: Number,
+    description: 'Number of records to skip',
+  })
   @Get('show-all-users')
-  findAll() {
-    return this.adminService.findAll();
+  findAll(@Query('take') take?: number, @Query('skip') skip?: number) {
+    // Если take или skip не переданы — передаем null или undefined
+    return this.adminService.findAll(+take, +skip);
+  }
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+  @Get('filter')
+  @ApiOperation({ summary: 'Filter users by fullName and phoneNumber' })
+  @ApiResponse({ status: 200, description: 'List of users matching filters' })
+  @ApiQuery({
+    name: 'fullName',
+    required: false,
+    type: String,
+    description: 'Full name filter',
+  })
+  @ApiQuery({
+    name: 'phoneNumber',
+    required: false,
+    type: String,
+    description: 'Phone number filter',
+  })
+  async filter(
+    @Query('fullName') fullName?: string,
+    @Query('phoneNumber') phoneNumber?: string,
+  ) {
+    return this.adminService.filter(fullName || '', phoneNumber || '');
   }
 }
